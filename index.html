@@ -918,9 +918,12 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
 </style>
 
 <!-- Firebase SDKs -->
-<script src="https://cdn.jsdelivr.net/npm/firebase@10/firebase-app-compat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@10/firebase-auth-compat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@10/firebase-firestore-compat.min.js"></script>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <script>
@@ -1030,6 +1033,8 @@ function updateUsageDisplay() {
 
 // ── Override doLogin ──────────────────────────────────────────────────────────
 window.doLogin = async function() {
+  const btn = document.querySelector("#login-form .auth-btn");
+  if (btn) { btn.disabled=true; btn.textContent="Signing in..."; }
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   if (!email || !pass) return;
@@ -1037,12 +1042,15 @@ window.doLogin = async function() {
     await auth.signInWithEmailAndPassword(email, pass);
     // onAuthStateChanged handles the rest
   } catch(e) {
+    const b1=document.querySelector('#login-form .auth-btn');if(b1){b1.disabled=false;b1.textContent='Sign in';}
     showAuthError(e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password'
       ? 'Invalid email or password.' : e.message);
   }
 };
 
 window.doSignup = async function() {
+  const btn = document.querySelector("#signup-form .auth-btn");
+  if (btn) { btn.disabled=true; btn.textContent="Creating account..."; }
   const name  = document.getElementById('su-name').value.trim();
   const email = document.getElementById('su-email').value.trim();
   const org   = document.getElementById('su-org').value.trim();
@@ -1059,6 +1067,7 @@ window.doSignup = async function() {
       created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
   } catch(e) {
+    const b2=document.querySelector('#signup-form .auth-btn');if(b2){b2.disabled=false;b2.textContent='Create account';}
     showAuthError(e.code === 'auth/email-already-in-use'
       ? 'An account with this email already exists.' : e.message);
   }
