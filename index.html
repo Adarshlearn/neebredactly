@@ -941,6 +941,18 @@ const FIREBASE_CONFIG = {
 };
 
 firebase.initializeApp(FIREBASE_CONFIG);
+
+// ════════════════ AUTH TAB SWITCHER ═════════════════════
+function switchAuthTab(tab) {
+  document.querySelectorAll(".auth-tab").forEach((t,i) => t.classList.toggle("active", ["login","signup"][i]===tab));
+  document.getElementById("login-form").classList.toggle("hidden", tab!=="login");
+  document.getElementById("signup-form").classList.toggle("hidden", tab!=="signup");
+  document.getElementById("auth-switch-text").innerHTML = tab==="login"
+    ? 'Don\x27t have an account? <a onclick="switchAuthTab(\x27signup\x27)">Sign up</a>'
+    : 'Already have an account? <a onclick="switchAuthTab(\x27login\x27)">Sign in</a>';
+  const err = document.getElementById("auth-error");
+  if (err) err.textContent = "";
+}
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
