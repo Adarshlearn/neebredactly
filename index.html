@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -498,7 +499,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div id="ctis-pdf-panel" class="card hidden">
               <div class="card-header"><h3>PDF upload</h3></div>
               <div class="card-body">
-                <div class="pdf-drop-zone" id="ctis-drop" onclick="document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'ctis',true)" ondragleave="onDrag(event,'ctis',false)" ondrop="onDrop(event,'ctis')">
+                <div class="pdf-drop-zone" id="ctis-drop" onclick="pdfTarget='ctis';document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'ctis',true)" ondragleave="onDrag(event,'ctis',false)" ondrop="onDrop(event,'ctis')">
                   <div class="drop-icon">📄</div>
                   <p>Drop a PDF here or <strong>click to browse</strong></p>
                   <div class="pdf-file-name" id="ctis-pdf-name"></div>
@@ -573,7 +574,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div id="ctgov-pdf-panel" class="card hidden">
               <div class="card-header"><h3>PDF upload</h3></div>
               <div class="card-body">
-                <div class="pdf-drop-zone" id="ctgov-drop" onclick="document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'ctgov',true)" ondragleave="onDrag(event,'ctgov',false)" ondrop="onDrop(event,'ctgov')">
+                <div class="pdf-drop-zone" id="ctgov-drop" onclick="pdfTarget='ctgov';document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'ctgov',true)" ondragleave="onDrag(event,'ctgov',false)" ondrop="onDrop(event,'ctgov')">
                   <div class="drop-icon">📄</div><p>Drop PDF or <strong>click to browse</strong></p>
                   <div class="pdf-file-name" id="ctgov-pdf-name"></div>
                 </div>
@@ -642,7 +643,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div id="hc-pdf-panel" class="card hidden">
               <div class="card-header"><h3>PDF upload</h3></div>
               <div class="card-body">
-                <div class="pdf-drop-zone" id="hc-drop" onclick="document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'hc',true)" ondragleave="onDrag(event,'hc',false)" ondrop="onDrop(event,'hc')">
+                <div class="pdf-drop-zone" id="hc-drop" onclick="pdfTarget='hc';document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'hc',true)" ondragleave="onDrag(event,'hc',false)" ondrop="onDrop(event,'hc')">
                   <div class="drop-icon">📄</div><p>Drop PDF or <strong>click to browse</strong></p>
                   <div class="pdf-file-name" id="hc-pdf-name"></div>
                 </div>
@@ -756,7 +757,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div id="cci-pdf-panel" class="card hidden">
               <div class="card-header"><h3>PDF upload</h3></div>
               <div class="card-body">
-                <div class="pdf-drop-zone" id="cci-drop" onclick="document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'cci',true)" ondragleave="onDrag(event,'cci',false)" ondrop="onDrop(event,'cci')">
+                <div class="pdf-drop-zone" id="cci-drop" onclick="pdfTarget='cci';document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'cci',true)" ondragleave="onDrag(event,'cci',false)" ondrop="onDrop(event,'cci')">
                   <div class="drop-icon">📄</div><p>Drop PDF or <strong>click to browse</strong></p>
                   <div class="pdf-file-name" id="cci-pdf-name"></div>
                 </div>
@@ -1224,20 +1225,38 @@ function renderTags(r){
 // ════════════════ PDF ════════════════════════════════════
 function onDrag(e,r,active){e.preventDefault();document.getElementById(r+'-drop').classList.toggle('drag',active);}
 function onDrop(e,r){e.preventDefault();onDrag(e,r,false);const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf'){pdfTarget=r;loadPdf(f,r);}}
-function onPdfSelect(e){const f=e.target.files[0];if(f&&pdfTarget)loadPdf(f,pdfTarget);e.target.value='';}
+function onPdfSelect(e){const f=e.target.files[0];if(f){if(!pdfTarget)pdfTarget=currentRegime;loadPdf(f,pdfTarget);}e.target.value='';}
 async function loadPdf(file,regime){
-  document.getElementById(regime+'-pdf-name').textContent=file.name;
+  // Auto-switch to PDF tab
+  switchInput(regime,'pdf');
+  const nameEl=document.getElementById(regime+'-pdf-name');
+  if(nameEl) nameEl.textContent=file.name;
   setHint(regime,'Extracting PDF text…');
+  clearErr(regime);
   try{
-    if(typeof pdfjsLib==='undefined')throw new Error('PDF.js unavailable');
+    if(typeof pdfjsLib==='undefined') throw new Error('PDF.js not loaded — please refresh the page.');
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     const ab=await file.arrayBuffer();
     const pdf=await pdfjsLib.getDocument({data:ab}).promise;
     let text='';
-    for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();text+=c.items.map(s=>s.str).join(' ')+'\n';}
-    document.getElementById(regime+'-pdf-text').value=text.trim();
-    setHint(regime,'PDF extracted. Ready to redact.');
-  }catch(err){showErr(regime,'PDF error: '+err.message);}
+    for(let i=1;i<=pdf.numPages;i++){
+      const pg=await pdf.getPage(i);
+      const c=await pg.getTextContent();
+      text+=c.items.map(s=>s.str).join(' ')+'\n';
+    }
+    const extracted=text.trim();
+    const ta=document.getElementById(regime+'-pdf-text');
+    if(ta) ta.value=extracted;
+    if(!extracted){
+      showErr(regime,'No text extracted. This PDF may be a scanned image — try copying and pasting the text manually instead.');
+      setHint(regime,'');
+    } else {
+      setHint(regime,'✓ '+pdf.numPages+' page'+(pdf.numPages===1?'':'s')+' extracted — ready to redact.');
+    }
+  }catch(err){
+    setHint(regime,'');
+    showErr(regime,'PDF error: '+err.message);
+  }
 }
 
 // ════════════════ REGIME PROMPTS ═════════════════════════
