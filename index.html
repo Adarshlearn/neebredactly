@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1335,21 +1336,16 @@ ${text}`;
       if (!res.ok) throw new Error(data.error||'API error');
       result = data.result; pages = data.pages;
     } else {
-      // Direct Anthropic call
-      const res = await fetch('https://api.anthropic.com/v1/messages',{
+      // Secure Worker proxy
+      const res = await fetch('https://neebredactly.adarshtripathi-bme.workers.dev/api/redact',{
         method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key':'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',
-          'anthropic-version':'2023-06-01',
-          'anthropic-dangerous-allow-browser':'true'
-        },
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4096,messages:[{role:'user',content:prompt}]})
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({prompt, text})
       });
-      if (!res.ok) { const e=await res.json(); throw new Error(e.error?.message||'API error '+res.status); }
+      if (!res.ok) { const e=await res.json(); throw new Error(e.error||'API error '+res.status); }
       const data = await res.json();
-      result = data.content.map(b=>b.text||'').join('');
-      pages = Math.max(1,Math.ceil(text.length/1500));
+      result = data.result;
+      pages = data.pages || Math.max(1,Math.ceil(text.length/1500));
     }
 
     const clean = result.replace(/```json|```/g,'').trim();
@@ -1679,20 +1675,15 @@ async function sendChatMsg(text){
   showTyping();
   const systemPrompt=`You are a helpful expert assistant for neebredactly, a clinical trial redaction platform. You have deep knowledge of EU CTIS/EMA (CTR 536/2014, Policy 0070, June 2024 rules), ClinicalTrials.gov (42 CFR Part 11, HIPAA Safe Harbor 18 identifiers), Health Canada PRCI (2019), and custom CCI redaction. Be concise and practical. Keep responses under 150 words unless a detailed comparison is genuinely needed. Format for chat — no headers.`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('https://neebredactly.adarshtripathi-bme.workers.dev/api/chat',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':'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',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-allow-browser':'true'
-      },
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:systemPrompt,messages:chatHistory})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:systemPrompt,messages:chatHistory})
     });
-    if(!res.ok){hideTyping();addBotMsg('API error — please try again.');return;}
+    if(!res.ok){hideTyping();addBotMsg('Connection error — please try again.');return;}
     const data=await res.json();
     hideTyping();
-    const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, I could not get a response.';
+    const reply=data.reply||'Sorry, I could not get a response.';
     chatHistory.push({role:'assistant',content:reply});
     addBotMsg(reply);
   }catch(err){hideTyping();addBotMsg('Sorry, there was a connection error. Please try again.');}
