@@ -478,7 +478,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
                 <div class="story-ring"><div class="story-inner">📝</div></div>
                 <span>Paste text</span>
               </div>
-              <div class="story-tab" id="ctis-st-pdf" onclick="switchInput('ctis','pdf')">
+              <div class="story-tab" id="ctis-st-pdf" onclick="switchInput('ctis','pdf');pdfTarget='ctis';document.getElementById('pdf-input-main').click()">
                 <div class="story-ring inactive"><div class="story-inner">📄</div></div>
                 <span>PDF upload</span>
               </div>
@@ -499,11 +499,14 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div id="ctis-pdf-panel" class="card hidden">
               <div class="card-header"><h3>PDF upload</h3></div>
               <div class="card-body">
-                <div class="pdf-drop-zone" id="ctis-drop" onclick="pdfTarget='ctis';document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'ctis',true)" ondragleave="onDrag(event,'ctis',false)" ondrop="onDrop(event,'ctis')">
-                  <div class="drop-icon">📄</div>
-                  <p>Drop a PDF here or <strong>click to browse</strong></p>
-                  <div class="pdf-file-name" id="ctis-pdf-name"></div>
-                </div>
+                <label for="pdf-file-ctis" style="display:block">
+                  <div class="pdf-drop-zone" id="ctis-drop" onclick="pdfTarget='ctis';document.getElementById('pdf-input-main').click()" ondragover="onDrag(event,'ctis',true)" ondragleave="onDrag(event,'ctis',false)" ondrop="onDrop(event,'ctis')">
+                    <div class="drop-icon">📄</div>
+                    <p>Drop a PDF here or <strong>click to browse</strong></p>
+                    <div class="pdf-file-name" id="ctis-pdf-name"></div>
+                  </div>
+                </label>
+                <input type="file" id="pdf-file-ctis" accept=".pdf" style="display:none" onchange="pdfTarget='ctis';onPdfSelect(event)"/>
                 <div><label style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:8px;">Extracted text (editable)</label><textarea class="doc-input" id="ctis-pdf-text" placeholder="PDF text appears here after upload…" style="min-height:140px"></textarea></div>
                 <div class="mt-12"><label style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.06em;text-transform:uppercase;display:block;margin-bottom:8px;">Redacted output</label><div class="output-box" id="ctis-pdf-out"><span class="output-placeholder">Redacted version appears here</span></div></div>
               </div>
@@ -538,6 +541,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div class="action-bar">
               <button class="btn-primary" id="btn-ctis" onclick="runRedact('ctis')">Redact document</button>
               <button class="btn-ghost" onclick="copyOut('ctis')">Copy result</button>
+              <button class="btn-ghost" id="dl-ctis" onclick="downloadPdf('ctis')" style="display:none">Download redacted PDF</button>
               <button class="btn-ghost" onclick="clearPanel('ctis')">Clear</button>
               <span class="hint-text" id="hint-ctis"></span>
             </div>
@@ -558,7 +562,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             </div>
             <div class="story-tabs">
               <div class="story-tab active" id="ctgov-st-text" onclick="switchInput('ctgov','text')"><div class="story-ring"><div class="story-inner">📝</div></div><span>Paste text</span></div>
-              <div class="story-tab" id="ctgov-st-pdf" onclick="switchInput('ctgov','pdf')"><div class="story-ring inactive"><div class="story-inner">📄</div></div><span>PDF upload</span></div>
+              <div class="story-tab" id="ctgov-st-pdf" onclick="switchInput('ctgov','pdf');pdfTarget='ctgov';document.getElementById('pdf-input-main').click()"><div class="story-ring inactive"><div class="story-inner">📄</div></div><span>PDF upload</span></div>
             </div>
           </div>
           <div class="content-area">
@@ -607,6 +611,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div class="action-bar">
               <button class="btn-primary" id="btn-ctgov" onclick="runRedact('ctgov')">Redact document</button>
               <button class="btn-ghost" onclick="copyOut('ctgov')">Copy result</button>
+              <button class="btn-ghost" id="dl-ctgov" onclick="downloadPdf('ctgov')" style="display:none">Download redacted PDF</button>
               <button class="btn-ghost" onclick="clearPanel('ctgov')">Clear</button>
               <span class="hint-text" id="hint-ctgov"></span>
             </div>
@@ -627,7 +632,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             </div>
             <div class="story-tabs">
               <div class="story-tab active" id="hc-st-text" onclick="switchInput('hc','text')"><div class="story-ring"><div class="story-inner">📝</div></div><span>Paste text</span></div>
-              <div class="story-tab" id="hc-st-pdf" onclick="switchInput('hc','pdf')"><div class="story-ring inactive"><div class="story-inner">📄</div></div><span>PDF upload</span></div>
+              <div class="story-tab" id="hc-st-pdf" onclick="switchInput('hc','pdf');pdfTarget='hc';document.getElementById('pdf-input-main').click()"><div class="story-ring inactive"><div class="story-inner">📄</div></div><span>PDF upload</span></div>
             </div>
           </div>
           <div class="content-area">
@@ -675,6 +680,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div class="action-bar">
               <button class="btn-primary" id="btn-hc" onclick="runRedact('hc')">Redact document</button>
               <button class="btn-ghost" onclick="copyOut('hc')">Copy result</button>
+              <button class="btn-ghost" id="dl-hc" onclick="downloadPdf('hc')" style="display:none">Download redacted PDF</button>
               <button class="btn-ghost" onclick="clearPanel('hc')">Clear</button>
               <span class="hint-text" id="hint-hc"></span>
             </div>
@@ -695,7 +701,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             </div>
             <div class="story-tabs">
               <div class="story-tab active" id="cci-st-text" onclick="switchInput('cci','text')"><div class="story-ring" style="background:linear-gradient(135deg,#6B4EFF,#0095f6)"><div class="story-inner">📝</div></div><span>Paste text</span></div>
-              <div class="story-tab" id="cci-st-pdf" onclick="switchInput('cci','pdf')"><div class="story-ring inactive"><div class="story-inner">📄</div></div><span>PDF upload</span></div>
+              <div class="story-tab" id="cci-st-pdf" onclick="switchInput('cci','pdf');pdfTarget='cci';document.getElementById('pdf-input-main').click()"><div class="story-ring inactive"><div class="story-inner">📄</div></div><span>PDF upload</span></div>
             </div>
           </div>
           <div class="content-area">
@@ -769,6 +775,7 @@ hr.divider { border: none; border-top: 1px solid var(--border2); margin: 8px 0; 
             <div class="action-bar">
               <button class="btn-primary" id="btn-cci" onclick="runRedact('cci')">Redact document</button>
               <button class="btn-ghost" onclick="copyOut('cci')">Copy result</button>
+              <button class="btn-ghost" id="dl-cci" onclick="downloadPdf('cci')" style="display:none">Download redacted PDF</button>
               <button class="btn-ghost" onclick="clearPanel('cci')">Clear</button>
               <span class="hint-text" id="hint-cci"></span>
             </div>
@@ -1225,7 +1232,7 @@ function renderTags(r){
 // ════════════════ PDF ════════════════════════════════════
 function onDrag(e,r,active){e.preventDefault();document.getElementById(r+'-drop').classList.toggle('drag',active);}
 function onDrop(e,r){e.preventDefault();onDrag(e,r,false);const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf'){pdfTarget=r;loadPdf(f,r);}}
-function onPdfSelect(e){const f=e.target.files[0];if(f){if(!pdfTarget)pdfTarget=currentRegime;loadPdf(f,pdfTarget);}e.target.value='';}
+function onPdfSelect(e){const f=e.target.files[0];if(f){const r=pdfTarget||currentRegime;pdfTarget=null;loadPdf(f,r);}e.target.value='';}
 async function loadPdf(file,regime){
   // Auto-switch to PDF tab
   switchInput(regime,'pdf');
@@ -1346,6 +1353,7 @@ ${text}`;
     const redacted = parsed.redacted_text||'';
     lastResult[regime]=redacted;
     renderOutput(outBox,redacted);
+    showDownloadBtn(regime);
     const count=(redacted.match(/\[REDACTED:[A-Z:_]+\]/g)||[]).length;
     const countEl=document.getElementById(regime+'-count'); if(countEl) countEl.textContent=count>0?`(${count} redacted)`:'';
     renderStats(regime,parsed.findings||[],parsed.notes||'');
@@ -1368,6 +1376,11 @@ function renderOutput(box, text) {
   const esc=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   box.innerHTML=esc.replace(/\[REDACTED:([A-Z:_]+)\]/g,(_,type)=>
     `<span class="redacted-span" data-type="${type}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>`);
+}
+
+function showDownloadBtn(regime) {
+  const btn = document.getElementById('dl-'+regime);
+  if (btn) btn.style.display = '';
 }
 function renderStats(regime,findings,notes){
   const statsEl=document.getElementById('stats-'+regime);
@@ -1392,6 +1405,7 @@ function clearPanel(r){
   document.getElementById('stats-'+r).classList.add('hidden');
   const c=document.getElementById(r+'-count');if(c)c.textContent='';
   lastResult[r]=''; clearErr(r);
+  const dl=document.getElementById('dl-'+r);if(dl)dl.style.display='none';
 }
 function updateHistory(){
   const el=document.getElementById('history-list');
@@ -1447,6 +1461,184 @@ function showToast(msg) {
   }
   t.textContent = msg; t.style.opacity = '1';
   setTimeout(()=>{ t.style.opacity='0'; }, 3000);
+}
+
+// ════════════════ PDF DOWNLOAD ══════════════════════
+function downloadPdf(regime) {
+  const text = lastResult[regime];
+  if (!text) return;
+
+  // Build clean redacted text — replace tokens with visible black-bar text
+  const clean = text.replace(/\[REDACTED:([A-Z:_]+)\]/g, (_, type) => {
+    const labels = {
+      'PPD:DIRECT':'[REDACTED]','PPD:INDIRECT':'[REDACTED]',
+      'PII:NAME':'[REDACTED]','PII:GEO':'[REDACTED]','PII:DATE':'[REDACTED]',
+      'PII:PHONE':'[REDACTED]','PII:EMAIL':'[REDACTED]','PII:SSN':'[REDACTED]','PII:ID':'[REDACTED]',
+      'PD:DIRECT':'[REDACTED]','PD:DATE':'[REDACTED]','PD:GEO':'[REDACTED]',
+      'PD:DEMO':'[REDACTED]','PD:SAE':'[REDACTED]','PD:STAFF':'[REDACTED]',
+      'CCI:FORMULATION':'[REDACTED-CCI]','CCI:DOSE':'[REDACTED-CCI]','CCI:IP':'[REDACTED-CCI]',
+      'CCI:MFG':'[REDACTED-CCI]','CCI:COMMERCIAL':'[REDACTED-CCI]','CCI:REG':'[REDACTED-CCI]',
+      'CCI:FINANCIAL':'[REDACTED-CCI]','CCI:VENDOR':'[REDACTED-CCI]','CCI:INTERNAL':'[REDACTED-CCI]',
+      'CBI':'[REDACTED-CCI]','AI:DETECTED':'[REDACTED]','KEYWORD':'[REDACTED]',
+    };
+    return labels[type] || '[REDACTED]';
+  });
+
+  // Use pdf-lib (loaded from CDN) to create a proper PDF
+  generateRedactedPdf(clean, regime);
+}
+
+async function generateRedactedPdf(text, regime) {
+  const btn = document.getElementById('dl-'+regime);
+  if (btn) { btn.disabled=true; btn.textContent='Generating PDF…'; }
+
+  try {
+    // Dynamically load pdf-lib
+    if (!window.PDFLib) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+        s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    const { PDFDocument, rgb, StandardFonts } = window.PDFLib;
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    const pageWidth = 595;  // A4
+    const pageHeight = 842;
+    const margin = 50;
+    const lineHeight = 14;
+    const fontSize = 10;
+    const maxWidth = pageWidth - margin * 2;
+
+    // Add header
+    const regimeNames = {
+      ctis: 'EU CTIS / EMA — Redacted Document',
+      ctgov: 'ClinicalTrials.gov — Redacted Document',
+      hc: 'Health Canada PRCI — Redacted Document',
+      cci: 'Custom CCI — Redacted Document'
+    };
+
+    let page = pdfDoc.addPage([pageWidth, pageHeight]);
+    let y = pageHeight - margin;
+
+    // Header
+    page.drawText('neebredactly', { x: margin, y, font: boldFont, size: 16, color: rgb(0.42,0.31,1) });
+    y -= 20;
+    page.drawText(regimeNames[regime] || 'Redacted Document', { x: margin, y, font: boldFont, size: 11, color: rgb(0.1,0.1,0.1) });
+    y -= 14;
+    page.drawText('Generated: ' + new Date().toLocaleString(), { x: margin, y, font, size: 8, color: rgb(0.5,0.5,0.5) });
+    y -= 6;
+    // Divider line
+    page.drawLine({ start:{x:margin,y}, end:{x:pageWidth-margin,y}, thickness:0.5, color:rgb(0.8,0.8,0.8) });
+    y -= 16;
+
+    // Word-wrap and draw text
+    const lines = text.split('\n');
+    for (const rawLine of lines) {
+      if (y < margin + lineHeight) {
+        page = pdfDoc.addPage([pageWidth, pageHeight]);
+        y = pageHeight - margin;
+      }
+
+      if (rawLine.trim() === '') { y -= lineHeight * 0.5; continue; }
+
+      // Split long lines to fit page width
+      const words = rawLine.split(' ');
+      let currentLine = '';
+
+      for (const word of words) {
+        const testLine = currentLine ? currentLine + ' ' + word : word;
+        const testWidth = font.widthOfTextAtSize(testLine, fontSize);
+
+        if (testWidth > maxWidth && currentLine) {
+          // Draw current line — check if it contains [REDACTED]
+          await drawLine(page, currentLine, margin, y, font, boldFont, fontSize, lineHeight, rgb, pageWidth);
+          y -= lineHeight;
+          currentLine = word;
+
+          if (y < margin + lineHeight) {
+            page = pdfDoc.addPage([pageWidth, pageHeight]);
+            y = pageHeight - margin;
+          }
+        } else {
+          currentLine = testLine;
+        }
+      }
+
+      if (currentLine) {
+        await drawLine(page, currentLine, margin, y, font, boldFont, fontSize, lineHeight, rgb, pageWidth);
+        y -= lineHeight;
+      }
+    }
+
+    // Footer on last page
+    y = margin;
+    page.drawText('REDACTED — neebredactly.com', { x: margin, y, font, size: 7, color: rgb(0.7,0.7,0.7) });
+
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'redacted_' + regime + '_' + Date.now() + '.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(err) {
+    console.error('PDF generation error:', err);
+    // Fallback: download as .txt
+    const blob = new Blob([text], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'redacted_' + regime + '.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent='Download redacted PDF'; }
+  }
+}
+
+async function drawLine(page, line, margin, y, font, boldFont, fontSize, lineHeight, rgb, pageWidth) {
+  // Split line into segments: normal text and [REDACTED*] blocks
+  const segments = [];
+  let remaining = line;
+  const pattern = /\[REDACTED[^\]]*\]/g;
+  let match;
+  let lastIndex = 0;
+  pattern.lastIndex = 0;
+
+  while ((match = pattern.exec(line)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ text: line.slice(lastIndex, match.index), redacted: false });
+    }
+    segments.push({ text: match[0], redacted: true });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < line.length) {
+    segments.push({ text: line.slice(lastIndex), redacted: false });
+  }
+
+  let x = margin;
+  for (const seg of segments) {
+    if (!seg.text) continue;
+    if (seg.redacted) {
+      // Draw black rectangle for redacted text
+      const w = Math.min(font.widthOfTextAtSize('█'.repeat(Math.max(4, seg.text.length)), fontSize), 120);
+      page.drawRectangle({ x, y: y-2, width: w, height: fontSize+2, color: rgb(0,0,0) });
+      x += w + 2;
+    } else {
+      const safeText = seg.text.replace(/[^\x20-\x7E]/g, ' ');
+      if (safeText.trim()) {
+        page.drawText(safeText, { x, y, font, size: fontSize, color: rgb(0.05,0.05,0.05) });
+      }
+      x += font.widthOfTextAtSize(safeText, fontSize);
+    }
+  }
 }
 
 // ════════════════ CHATBOT ════════════════════════════════
